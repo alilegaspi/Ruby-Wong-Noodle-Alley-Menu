@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no" />
+  <title>Noodle Alley Food Menu</title>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+      font-family: "Helvetica Neue", sans-serif;
+    }
+    .swiper {
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+    }
+    .swiper-slide {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      backface-visibility: hidden;
+      perspective: 1000px;
+    }
+    .swiper-slide img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      will-change: transform;
+      user-select: none;
+      touch-action: none;
+      backface-visibility: hidden;
+      transform-origin: center center;
+      transition: transform 0.15s ease-out;
+    }
+    .swiper-button-next,
+    .swiper-button-prev {
+      color: #fff;
+      opacity: 0.6;
+      transition: opacity 0.3s;
+    }
+    .swiper-button-next:hover,
+    .swiper-button-prev:hover {
+      opacity: 1;
+    }
+    .swiper-pagination-bullet {
+      background: #fff !important;
+      opacity: 0.5;
+    }
+    .swiper-pagination-bullet-active {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="swiper">
+    <div class="swiper-wrapper"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-pagination"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    // ----- Create 16 slides -----
+    const wrapper = document.querySelector(".swiper-wrapper");
+    for (let i = 1; i <= 16; i++) {
+      const slide = document.createElement("div");
+      slide.className = "swiper-slide";
+      slide.innerHTML = `<img src="menu/page${i}.jpg" alt="Page ${i}" loading="lazy" />`;
+      wrapper.appendChild(slide);
+    }
+
+    // ----- Swiper setup -----
+    const swiper = new Swiper(".swiper", {
+      effect: "cube",
+      cubeEffect: { shadow: false, slideShadows: false },
+      grabCursor: true,
+      speed: 650,
+      loop: false,
+      preloadImages: true,
+      navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+      pagination: { el: ".swiper-pagination", clickable: true },
+    });
+
+    // ----- Zoom + Pan with point-awareness -----
+    document.querySelectorAll(".swiper-slide img").forEach((img) => {
+      let scale = 1, isZoomed = false;
+      let originX = 0, originY = 0;
+      let moveX = 0, moveY = 0;
+      let lastX = 0, lastY = 0;
+      let startX = 0, startY = 0;
+      let startDist = 0;
+      let doubleTap = 0;
+
+      const updateTransform = () => {
+        img.style.transformOrigin = `${originX}px ${originY}px`;
+        img.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(${scale})`;
+      };
+
+      // Compute transform origin from touch point
+      const setOrigin = (touch) => {
+        const rect = img.getBoundingClientRect();
+        originX = touch.clientX - rect.left;
+        originY = touch.clientY - rect.top;
+      };
+
+      // Double-tap zoom
+      img.addEventListener("touchend", (e) => {
+        const now = Date.now();
+        if (now - doubleTap < 300 && e.changedTouches.length === 1) {
+          setOrigin(e.changedTouches[0]);
+          isZoomed = !isZoomed;
+          scale = isZoomed ? 2.5 : 1;
+          moveX = moveY = 0;
+          updateTransform();
+        }
+        doubleTap = now;
+      });
+
+      // Touch start
+      img.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 1 && isZoomed) {
+          startX = e.touches[0].clientX - lastX;
+          startY = e.touches[0].clientY - lastY;
+        } else if (e.touches.length === 2) {
+          const dx = e.touches[1].pageX - e.touches[0].pageX;
+          const dy = e.touches[1].pageY - e.touches[0].pageY;
+          startDist = Math.hypot(dx, dy);
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          setOrigin({ clientX: midX, clientY: midY });
+        }
+      });
+
+      // Pan + pinch
+      img.addEventListener("touchmove", (e) => {
+        if (e.touches.length === 1 && isZoomed) {
+          e.preventDefault();
+          moveX = e.touches[0].clientX - startX;
+          moveY = e.touches[0].clientY - startY;
+          lastX = moveX;
+          lastY = moveY;
+        } else if (e.touches.length === 2) {
+          e.preventDefault();
+          const dx = e.touches[1].pageX - e.touches[0].pageX;
+          const dy = e.touches[1].pageY - e.touches[0].pageY;
+          const dist = Math.hypot(dx, dy);
+          if (!startDist) startDist = dist;
+          const zoom = Math.min(Math.max(scale * (dist / startDist), 1), 4);
+          scale = zoom;
+          isZoomed = scale > 1.05;
+        }
+        requestAnimationFrame(updateTransform);
+      });
+
+      img.addEventListener("touchend", () => {
+        startDist = 0;
+      });
+
+      // Reset zoom between pages
+      swiper.on("slideChange", () => {
+        scale = 1;
+        moveX = moveY = lastX = lastY = 0;
+        isZoomed = false;
+        img.style.transformOrigin = "center center";
+        updateTransform();
+      });
+    });
+  </script>
+</body>
+</html>
