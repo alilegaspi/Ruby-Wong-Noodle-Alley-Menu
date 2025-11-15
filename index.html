@@ -27,6 +27,7 @@
       background: #000;
       backface-visibility: hidden;
       perspective: 1000px;
+      position: relative;
     }
     .swiper-slide img {
       width: 100%;
@@ -61,12 +62,12 @@
     /* Special Off Menu Badge */
     .special-badge {
       position: absolute;
-      bottom: 40px;
+      bottom: 60px;
       left: 50%;
       transform: translateX(-50%);
       background: linear-gradient(135deg, #ff6b6b, #ee5a24);
       color: #fff;
-      padding: 12px 24px;
+      padding: 12px 28px;
       border-radius: 8px;
       font-weight: bold;
       font-size: 18px;
@@ -75,6 +76,7 @@
       box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
       z-index: 10;
       animation: flash 1.5s ease-in-out infinite;
+      pointer-events: none;
     }
     
     @keyframes flash {
