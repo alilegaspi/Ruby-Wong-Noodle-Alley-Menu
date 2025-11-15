@@ -135,16 +135,12 @@
     `;
     wrapper.appendChild(slide3);
     
-    // Add original page 2, then pages 4-16 as pages 4-17
-    const slide4 = document.createElement("div");
-    slide4.className = "swiper-slide";
-    slide4.innerHTML = `<img src="menu/page2.jpg" alt="Page 4" loading="lazy" />`;
-    wrapper.appendChild(slide4);
-    
-    for (let i = 4; i <= 16; i++) {
+    // Add original pages 2, 4-16 in order
+    for (let i = 2; i <= 16; i++) {
+      if (i === 3) continue; // Skip page 3 as it's already page 2
       const slide = document.createElement("div");
       slide.className = "swiper-slide";
-      slide.innerHTML = `<img src="menu/page${i}.jpg" alt="Page ${i + 1}" loading="lazy" />`;
+      slide.innerHTML = `<img src="menu/page${i}.jpg" alt="Page ${i === 2 ? '4' : i + 1}" loading="lazy" />`;
       wrapper.appendChild(slide);
     }
 
