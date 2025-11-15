@@ -123,17 +123,23 @@
     slide1.innerHTML = `<img src="menu/page1.jpg" alt="Page 1" loading="lazy" />`;
     wrapper.appendChild(slide1);
     
-    // Add page 2 (Omi Robatayaki) with special badge
+    // Add page 2 (original page 2)
     const slide2 = document.createElement("div");
     slide2.className = "swiper-slide";
-    slide2.innerHTML = `
-      <div class="special-badge">Special Off Menu</div>
-      <img src="menu/page2_omi.jpeg" alt="Page 2" loading="lazy" />
-    `;
+    slide2.innerHTML = `<img src="menu/page2.jpg" alt="Page 2" loading="lazy" />`;
     wrapper.appendChild(slide2);
     
-    // Add original pages 2-16 as pages 3-17
-    for (let i = 2; i <= 16; i++) {
+    // Add page 3 (Omi Robatayaki) with special badge
+    const slide3 = document.createElement("div");
+    slide3.className = "swiper-slide";
+    slide3.innerHTML = `
+      <div class="special-badge">Special Off Menu</div>
+      <img src="menu/page2_omi.jpeg" alt="Page 3" loading="lazy" />
+    `;
+    wrapper.appendChild(slide3);
+    
+    // Add original pages 3-16 as pages 4-17
+    for (let i = 3; i <= 16; i++) {
       const slide = document.createElement("div");
       slide.className = "swiper-slide";
       slide.innerHTML = `<img src="menu/page${i}.jpg" alt="Page ${i + 1}" loading="lazy" />`;
