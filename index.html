@@ -73,12 +73,20 @@
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
-    // ----- Create single page slide -----
+    // ----- Create two page slides -----
     const wrapper = document.querySelector(".swiper-wrapper");
-    const slide = document.createElement("div");
-    slide.className = "swiper-slide";
-    slide.innerHTML = `<img src="menu/OMI RWG.png" alt="Menu Page" loading="lazy" />`;
-    wrapper.appendChild(slide);
+
+    const pages = [
+      { src: "menu/page1.jpg", alt: "Menu Page 1" },
+      { src: "menu/page2.jpg", alt: "Menu Page 2" },
+    ];
+
+    pages.forEach((page) => {
+      const slide = document.createElement("div");
+      slide.className = "swiper-slide";
+      slide.innerHTML = `<img src="${page.src}" alt="${page.alt}" loading="lazy" />`;
+      wrapper.appendChild(slide);
+    });
 
     // ----- Swiper setup -----
     const swiper = new Swiper(".swiper", {
