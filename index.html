@@ -61,47 +61,6 @@
     .swiper-pagination-bullet-active {
       opacity: 1;
     }
-    
-    /* Special Off Menu Badge */
-    .special-badge {
-      position: absolute;
-      bottom: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-      color: #fff;
-      padding: 12px 28px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 18px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-      z-index: 10;
-      animation: flash 1.5s ease-in-out infinite;
-      pointer-events: none;
-    }
-    
-    @keyframes flash {
-      0%, 100% {
-        opacity: 1;
-        transform: translateX(-50%) scale(1);
-      }
-      50% {
-        opacity: 0.7;
-        transform: translateX(-50%) scale(1.05);
-      }
-    }
-    
-    /* Mobile specific positioning */
-    @media (max-width: 768px) {
-      .special-badge {
-        bottom: 80px;
-        font-size: 14px;
-        padding: 10px 20px;
-        letter-spacing: 1.5px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -114,37 +73,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
-    // ----- Create 17 slides -----
+    // ----- Create single page slide -----
     const wrapper = document.querySelector(".swiper-wrapper");
-    
-    // Add page 1
-    const slide1 = document.createElement("div");
-    slide1.className = "swiper-slide";
-    slide1.innerHTML = `<img src="menu/page1.jpg" alt="Page 1" loading="lazy" />`;
-    wrapper.appendChild(slide1);
-    
-    // Add page 2 (original page 2)
-    const slide2 = document.createElement("div");
-    slide2.className = "swiper-slide";
-    slide2.innerHTML = `<img src="menu/page2.jpg" alt="Page 2" loading="lazy" />`;
-    wrapper.appendChild(slide2);
-    
-    // Add page 3 (Omi Robatayaki) with special badge
-    const slide3 = document.createElement("div");
-    slide3.className = "swiper-slide";
-    slide3.innerHTML = `
-      <div class="special-badge">Special Off Menu</div>
-      <img src="menu/OMI%20RWG.png" alt="Page 3" loading="lazy" />
-    `;
-    wrapper.appendChild(slide3);
-    
-    // Add original pages 3-16 as pages 4-17
-    for (let i = 3; i <= 16; i++) {
-      const slide = document.createElement("div");
-      slide.className = "swiper-slide";
-      slide.innerHTML = `<img src="menu/page${i}.jpg" alt="Page ${i + 1}" loading="lazy" />`;
-      wrapper.appendChild(slide);
-    }
+    const slide = document.createElement("div");
+    slide.className = "swiper-slide";
+    slide.innerHTML = `<img src="menu/OMI RWG.png" alt="Menu Page" loading="lazy" />`;
+    wrapper.appendChild(slide);
 
     // ----- Swiper setup -----
     const swiper = new Swiper(".swiper", {
