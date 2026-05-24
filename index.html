@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no" />
+        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -61,6 +61,54 @@
     .swiper-pagination-bullet-active {
       opacity: 1;
     }
+    html, body {
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+    .swiper {
+      touch-action: none;
+    }
+    
+    /* Special Off Menu Badge */
+    .special-badge {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+      z-index: 10;
+      animation: flash 1.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    
+    @keyframes flash {
+      0%, 100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+      50% {
+        opacity: 0.7;
+        transform: translateX(-50%) scale(1.05);
+      }
+    }
+    
+    /* Mobile specific positioning */
+    @media (max-width: 768px) {
+      .special-badge {
+        bottom: 80px;
+        font-size: 14px;
+        padding: 10px 20px;
+        letter-spacing: 1.5px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -73,20 +121,37 @@
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
-    // ----- Create two page slides -----
+    // ----- Create 17 slides -----
     const wrapper = document.querySelector(".swiper-wrapper");
-
-    const pages = [
-      { src: "menu/Noodle alley menu 2026_page-0001.jpg", alt: "Menu Page 1" },
-      { src: "menu/Noodle alley menu 2026_page-0002.jpg", alt: "Menu Page 2" },
-    ];
-
-    pages.forEach((page) => {
+    
+    // Add page 1
+    const slide1 = document.createElement("div");
+    slide1.className = "swiper-slide";
+    slide1.innerHTML = `<img src="menu/page1.jpg" alt="Page 1" loading="lazy" />`;
+    wrapper.appendChild(slide1);
+    
+    // Add page 2 (original page 2)
+    const slide2 = document.createElement("div");
+    slide2.className = "swiper-slide";
+    slide2.innerHTML = `<img src="menu/page2.jpg" alt="Page 2" loading="lazy" />`;
+    wrapper.appendChild(slide2);
+    
+    // Add page 3 (Omi Robatayaki) with special badge
+    const slide3 = document.createElement("div");
+    slide3.className = "swiper-slide";
+    slide3.innerHTML = `
+      <div class="special-badge">Special Off Menu</div>
+      <img src="menu/OMI%20RWG.png" alt="Page 3" loading="lazy" />
+    `;
+    wrapper.appendChild(slide3);
+    
+    // Add original pages 3-16 as pages 4-17
+    for (let i = 3; i <= 16; i++) {
       const slide = document.createElement("div");
       slide.className = "swiper-slide";
-      slide.innerHTML = `<img src="${page.src}" alt="${page.alt}" loading="lazy" />`;
+      slide.innerHTML = `<img src="menu/page${i}.jpg" alt="Page ${i + 1}" loading="lazy" />`;
       wrapper.appendChild(slide);
-    });
+    }
 
     // ----- Swiper setup -----
     const swiper = new Swiper(".swiper", {
@@ -115,14 +180,22 @@
         img.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(${scale})`;
       };
 
-      // Compute transform origin from touch point
+      const resetZoom = () => {
+        scale = 1;
+        moveX = moveY = lastX = lastY = 0;
+        isZoomed = false;
+        img.style.transformOrigin = "center center";
+        img.style.transition = "transform 0.15s ease-out";
+        updateTransform();
+        swiper.allowTouchMove = true;
+      };
+
       const setOrigin = (touch) => {
         const rect = img.getBoundingClientRect();
         originX = touch.clientX - rect.left;
         originY = touch.clientY - rect.top;
       };
 
-      // Double-tap zoom
       img.addEventListener("touchend", (e) => {
         const now = Date.now();
         if (now - doubleTap < 300 && e.changedTouches.length === 1) {
@@ -130,16 +203,23 @@
           isZoomed = !isZoomed;
           scale = isZoomed ? 2.5 : 1;
           moveX = moveY = 0;
+          img.style.transition = "transform 0.2s ease-out";
           updateTransform();
+          swiper.allowTouchMove = !isZoomed;
         }
         doubleTap = now;
+        if (e.touches.length === 0) {
+          startDist = 0;
+          swiper.allowTouchMove = !isZoomed;
+        }
       });
 
-      // Touch start
       img.addEventListener("touchstart", (e) => {
+        img.style.transition = "none";
         if (e.touches.length === 1 && isZoomed) {
           startX = e.touches[0].clientX - lastX;
           startY = e.touches[0].clientY - lastY;
+          swiper.allowTouchMove = false;
         } else if (e.touches.length === 2) {
           const dx = e.touches[1].pageX - e.touches[0].pageX;
           const dy = e.touches[1].pageY - e.touches[0].pageY;
@@ -147,10 +227,10 @@
           const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
           const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
           setOrigin({ clientX: midX, clientY: midY });
+          swiper.allowTouchMove = false;
         }
       });
 
-      // Pan + pinch
       img.addEventListener("touchmove", (e) => {
         if (e.touches.length === 1 && isZoomed) {
           e.preventDefault();
@@ -167,22 +247,12 @@
           const zoom = Math.min(Math.max(scale * (dist / startDist), 1), 4);
           scale = zoom;
           isZoomed = scale > 1.05;
+          swiper.allowTouchMove = false;
         }
         requestAnimationFrame(updateTransform);
       });
 
-      img.addEventListener("touchend", () => {
-        startDist = 0;
-      });
-
-      // Reset zoom between pages
-      swiper.on("slideChange", () => {
-        scale = 1;
-        moveX = moveY = lastX = lastY = 0;
-        isZoomed = false;
-        img.style.transformOrigin = "center center";
-        updateTransform();
-      });
+      swiper.on("slideChange", resetZoom);
     });
   </script>
 </body>
